@@ -6,6 +6,19 @@ export const Container = styled.View`
   margin-top: 16px;
 `;
 
+export const EditButton = styled.TouchableOpacity.attrs({
+  activeOpacity: 0.5,
+})`
+  width: 40px;
+  height: 40px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 32px;
+  background-color: ${({ theme }) => theme.colors.white_02};
+`;
+
 export const Label = styled.Text`
   font-size: 12px;
   color: ${({ theme }) => theme.colors.primary_02};

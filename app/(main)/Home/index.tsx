@@ -7,11 +7,6 @@ import { Clock01 } from '@/assets/pictures';
 import { View } from 'react-native';
 import ListCategory from '@/components/ListCategory/ListCategory';
 import Catalog from '@/components/Catalog/Catalog';
-import { useAuth } from '@/hooks/useAuth';
-import { handleError } from '@/utils/handleError';
-import { api } from '@/services/api';
-import { useEffect, useState } from 'react';
-import { prettyLog } from '@/services/prettyLog';
 import {
   AddressContainer,
   AddressLabel,
@@ -33,6 +28,7 @@ const Home = () => {
   const { control, handleSubmit } = useForm<FormData>();
 
   const onSubmit = (data: FormData) => {
+    // eslint-disable-next-line no-console
     console.log(data);
   };
 
@@ -59,6 +55,7 @@ const Home = () => {
             iconLeft={<Search />}
             placeholder="Buscar produtos..."
             containerStyle={{ backgroundColor: theme.colors.background }}
+            onSubmitEditing={handleSubmit(onSubmit)}
           />
           <Highlight>
             <HightlightImage source={Clock01} contentFit="contain" />

@@ -23,7 +23,7 @@ import PinLight from './generics/pin-light.svg';
 import ArrowDown from './generics/arrow-down.svg';
 import ArrowLeft from './generics/arrow-left.svg';
 import CouponIcon from './generics/coupon-icon.svg';
-import CreditCard from './generics/credit-card.svg';
+import CreditCardIcon from './generics/credit-card.svg';
 
 import Success from './modal/success.svg';
 import Warning from './modal/warning.svg';
@@ -47,7 +47,7 @@ export {
   PinLight,
   Smartphone,
   Background,
-  CreditCard,
+  CreditCardIcon,
 };
 
 export {

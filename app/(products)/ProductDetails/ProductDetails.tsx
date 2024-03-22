@@ -8,10 +8,13 @@ import {
 import { Clock01 } from '@/assets/pictures';
 import { Button } from '@/components/Button/Button';
 import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
-import { useState } from 'react';
-import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'react-native';
 import { theme } from '@/global/theme';
+import { handleError } from '@/utils/handleError';
+import { api } from '@/services/api';
+import { formatCurrency } from '@/utils/format';
 import {
   Category,
   Content,
@@ -22,8 +25,43 @@ import {
   Title,
 } from './styles';
 
+export interface Product {
+  id: string;
+  name: string;
+  price: string;
+  stock: string;
+  category: Category;
+  banner: string;
+  description?: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
 const ProductDetails = () => {
+  const params = useLocalSearchParams();
+  const { product_id } = params;
+
   const [isOpen, setIsOpen] = useState(false);
+
+  const [product, setProduct] = useState<Product>();
+
+  const getProduct = async () => {
+    try {
+      const response = await api.get(`product/one?product_id=${product_id}`);
+      setProduct(response.data);
+    } catch (error) {
+      handleError('Produto indisponível no momento, tente mais tarde');
+    }
+  };
+
+  useEffect(() => {
+    getProduct();
+  }, [product_id]);
 
   return (
     <>
@@ -31,7 +69,7 @@ const ProductDetails = () => {
       <GlobalScrollView>
         <GlobalContainer>
           <Header
-            title="Carrinho"
+            title="Detalhes do produto"
             styles={{ position: 'absolute', zIndex: 100 }}
             onPress={() => router.push('/Home/')}
           />
@@ -39,20 +77,16 @@ const ProductDetails = () => {
             <ImageProduct source={Clock01} contentFit="contain" />
           </ImageContainer>
           <Content>
-            <Category>Relógios</Category>
+            <Category>{product?.category.name}</Category>
             <Row>
-              <Title>
-                Relógio Saint Germain Bronx Rosé Gold 40mm Cor da correia Marrom
-              </Title>
-              <Price>R$ 150,00</Price>
+              <Title>{product?.name}</Title>
+              <Price>
+                {product?.price && formatCurrency(parseFloat(product?.price))}
+              </Price>
             </Row>
             <GlobalLink>Descrição</GlobalLink>
-            <GlobalText align="flex-start">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem
-              temporibus rerum dolore, id enim exercitationem eum officia ipsum
-              sequi voluptatibus quas atque ipsa. Maxime non magni officia
-              tempora voluptatem impedit.
-            </GlobalText>
+            <GlobalText align="flex-start">{product?.description}</GlobalText>
+
             <Button style={{ marginTop: 56 }} onPress={() => setIsOpen(true)}>
               Adicionar produto
             </Button>

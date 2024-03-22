@@ -1,4 +1,4 @@
-import { CreditCard, Lock, Logout, PinLight, User } from '@/assets/icons';
+import { CreditCardIcon, Lock, Logout, PinLight, User } from '@/assets/icons';
 import Header from '@/components/Header/Header';
 import { GlobalContainer } from '@/global/styles';
 import { router } from 'expo-router';
@@ -20,7 +20,7 @@ const MenuItems = [
   {
     id: '3',
     title: 'Meus cartões',
-    icon: <CreditCard />,
+    icon: <CreditCardIcon />,
   },
   {
     id: '4',

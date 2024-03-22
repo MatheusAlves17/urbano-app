@@ -16,6 +16,7 @@ import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
 import { ProfileForm, ProfileSchema } from '@/validation/Profile.validation';
 import {
   Container,
+  EditButton,
   ErrorMessage,
   InputContainer,
   Label,
@@ -73,7 +74,9 @@ const Profile = () => {
         <Container>
           <Row onPress={() => setIsEditing(true)}>
             <Subtitle>Editar perfil</Subtitle>
-            <Pen />
+            <EditButton>
+              <Pen />
+            </EditButton>
           </Row>
           <View style={styles.top}>
             <Label>Nome completo</Label>
@@ -112,7 +115,9 @@ const Profile = () => {
         <Container>
           <Row onPress={handleSubmit(onSubmit)}>
             <Subtitle>Editar perfil</Subtitle>
-            <Check />
+            <EditButton>
+              <Check />
+            </EditButton>
           </Row>
           <Input
             control={control}

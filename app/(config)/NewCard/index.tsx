@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import Input from '@/components/Input/Input';
-import { CreditCard } from '@/assets/icons';
+import { CreditCardIcon } from '@/assets/icons';
 import { StyleSheet, View } from 'react-native';
 import { theme } from '@/global/theme';
 import { Button } from '@/components/Button/Button';
@@ -27,7 +27,7 @@ const NewCard = () => {
       case 'Payment':
         router.push('/Payment/Payment');
         break;
-      case 'Address':
+      case 'MyCards':
         router.push('/MyCards/');
         break;
       default:
@@ -42,7 +42,7 @@ const NewCard = () => {
 
   return (
     <GlobalContainer>
-      <Header onPress={() => router.push('/Settings/')} title="Cartão" />
+      <Header onPress={handleGoBack} title="Cartão" />
       <Container>
         <Input
           name="number"
@@ -51,7 +51,7 @@ const NewCard = () => {
           keyboardType="decimal-pad"
           placeholder="Informe o número do cartão"
           label="Número do cartão"
-          iconLeft={<CreditCard />}
+          iconLeft={<CreditCardIcon />}
           containerStyle={styles.input}
         />
         <Row>
@@ -64,7 +64,7 @@ const NewCard = () => {
               keyboardType="decimal-pad"
               placeholder="Ex: 00/00"
               label="Validade"
-              iconLeft={<CreditCard />}
+              iconLeft={<CreditCardIcon />}
               containerStyle={styles.input}
             />
           </View>
@@ -76,7 +76,7 @@ const NewCard = () => {
               keyboardType="decimal-pad"
               placeholder="Ex: 000"
               label="CVV"
-              iconLeft={<CreditCard />}
+              iconLeft={<CreditCardIcon />}
               containerStyle={styles.input}
             />
           </View>
@@ -86,7 +86,7 @@ const NewCard = () => {
           control={control}
           placeholder="Informe o nome no cartão"
           label="Nome no cartão"
-          iconLeft={<CreditCard />}
+          iconLeft={<CreditCardIcon />}
           containerStyle={styles.input}
         />
         <Button onPress={handleSubmit(onSubmit)} style={{ marginTop: 56 }}>
