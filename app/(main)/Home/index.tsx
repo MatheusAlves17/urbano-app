@@ -8,6 +8,10 @@ import { View } from 'react-native';
 import ListCategory from '@/components/ListCategory/ListCategory';
 import Catalog from '@/components/Catalog/Catalog';
 import { useAuth } from '@/hooks/useAuth';
+import { handleError } from '@/utils/handleError';
+import { api } from '@/services/api';
+import { useEffect, useState } from 'react';
+import { prettyLog } from '@/services/prettyLog';
 import {
   AddressContainer,
   AddressLabel,
@@ -26,8 +30,6 @@ type FormData = {
 };
 
 const Home = () => {
-  const { user } = useAuth();
-
   const { control, handleSubmit } = useForm<FormData>();
 
   const onSubmit = (data: FormData) => {

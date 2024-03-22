@@ -3,37 +3,24 @@ import { FlatList, View } from 'react-native';
 import { Clock01, ClockCategories } from '@/assets/pictures';
 import { formatCurrency } from '@/utils/format';
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { api } from '@/services/api';
+import { prettyLog } from '@/services/prettyLog';
+import { handleError } from '@/utils/handleError';
 import { Card, CardImage, Content, ItemsContainer, Row } from './styles';
 
-const Products = [
-  {
-    id: 'asfhb',
-    title: 'Relógio de couro',
-    price: 1200,
-    image: Clock01,
-  },
-  {
-    id: 'vbnm',
-    title: 'Relógio preto',
-    price: 2500,
-    image: Clock01,
-  },
-  {
-    id: 'uihnm',
-    title: 'Relógio de couro',
-    price: 1200,
-    image: Clock01,
-  },
-  {
-    id: 'yuio',
-    title: 'Relógio preto',
-    price: 2500,
-    image: Clock01,
-  },
-];
+export interface Products {
+  id: string;
+  name: string;
+  price: string;
+  stock: string;
+  banner: string;
+}
 
 const Catalog = () => {
   const router = useRouter();
+
+  const [products, setProducts] = useState<Products[]>([]);
 
   const handleGoTo = (product_id: string) => {
     router.push({
@@ -42,16 +29,30 @@ const Catalog = () => {
     });
   };
 
+  const getProducts = async () => {
+    try {
+      const response = await api.get(`product/all`);
+      setProducts(response.data);
+      prettyLog(products);
+    } catch (error) {
+      handleError('Não foi possível carregar os produtos');
+    }
+  };
+
+  useEffect(() => {
+    getProducts();
+  }, []);
+
   return (
     <Content>
       <GlobalSubtitle>Catálogo</GlobalSubtitle>
       <ItemsContainer>
-        {Products.map(item => (
+        {products.map(item => (
           <Card key={item.id} onPress={() => handleGoTo(item.id)}>
-            <CardImage source={item.image} contentFit="contain" />
+            <CardImage source={item.banner} contentFit="contain" />
             <Row>
-              <GlobalText>{item.title}</GlobalText>
-              <GlobalLink>{formatCurrency(item.price)}</GlobalLink>
+              <GlobalText>{item.name}</GlobalText>
+              <GlobalLink>{formatCurrency(parseFloat(item.price))}</GlobalLink>
             </Row>
           </Card>
         ))}
