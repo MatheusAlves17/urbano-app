@@ -10,6 +10,7 @@ import { handleError } from '@/utils/handleError';
 import { api } from '@/services/api';
 import CreditCard from '@/components/CreditCard/CreditCard';
 import { theme } from '@/global/theme';
+import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
 import { Container, EditButton, Row } from './styles';
 
 export interface Card {
@@ -28,6 +29,10 @@ const MyCards = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+
   const handleNewCard = () => {
     router.push({
       pathname: '/NewCard/',
@@ -45,6 +50,23 @@ const MyCards = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDeleteCard = async (card_id: string) => {
+    setIsDeleteLoading(true);
+    try {
+      const response = await api.delete(`user/card?card_id=${card_id}`);
+      setIsSuccess(true);
+    } catch (error) {
+      handleError('Falha ao excluir cartão de crédito, tente mais tarde.');
+    } finally {
+      setIsDeleteLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsSuccess(false);
+    getCards();
   };
 
   useEffect(() => {
@@ -66,7 +88,12 @@ const MyCards = () => {
         ) : (
           <View>
             {cards.map(item => (
-              <CreditCard item={item} key={item.id} />
+              <CreditCard
+                item={item}
+                key={item.id}
+                onDelete={handleDeleteCard}
+                loading={isDeleteLoading}
+              />
             ))}
             {cards.length < 1 && (
               <GlobalText>Não há encontramos cartões cadastrado</GlobalText>
@@ -74,6 +101,13 @@ const MyCards = () => {
           </View>
         )}
       </Container>
+      <ModalSuccess
+        isOpen={isSuccess}
+        title="Sucesso"
+        description="Cartão excluído"
+        isTransparent
+        onClose={handleCloseModal}
+      />
     </GlobalContainer>
   );
 };

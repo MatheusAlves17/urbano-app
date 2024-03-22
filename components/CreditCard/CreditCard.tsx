@@ -1,7 +1,8 @@
 import { shadow } from '@/global/shadow';
 import { CreditCardIcon, Pen, Trash } from '@/assets/icons';
-import { TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
+import { theme } from '@/global/theme';
 import {
   Card,
   CardNumber,
@@ -24,9 +25,11 @@ interface Card {
 
 interface ICreditCardProps {
   item: Card;
+  loading?: boolean;
+  onDelete: (card_id: string) => void;
 }
 
-const CreditCard = ({ item }: ICreditCardProps) => {
+const CreditCard = ({ item, loading, onDelete }: ICreditCardProps) => {
   const handleEditCard = () => {
     router.push({
       pathname: '/NewCard/',
@@ -71,9 +74,13 @@ const CreditCard = ({ item }: ICreditCardProps) => {
             <Pen />
           </IconWrapper>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => onDelete(item.id)}>
           <IconWrapper>
-            <Trash />
+            {loading ? (
+              <ActivityIndicator color={theme.colors.primary_01} size={20} />
+            ) : (
+              <Trash />
+            )}
           </IconWrapper>
         </TouchableOpacity>
       </Row>
