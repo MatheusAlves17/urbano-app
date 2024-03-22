@@ -9,11 +9,18 @@ import { StyleSheet, View } from 'react-native';
 import { theme } from '@/global/theme';
 import { Button } from '@/components/Button/Button';
 import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
+import { handleError } from '@/utils/handleError';
+import { api } from '@/services/api';
+import { CreditCardForm, CreditCardSchema } from '@/validation/Card.validation';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useAuth } from '@/hooks/useAuth';
 import { Container, Row } from './styles';
 
 const NewCard = () => {
-  const { control, handleSubmit } = useForm({
-    // resolver: yupResolver(SignupSchema),
+  const { user } = useAuth();
+
+  const { control, handleSubmit } = useForm<CreditCardForm>({
+    resolver: yupResolver(CreditCardSchema),
   });
 
   const params = useLocalSearchParams();
@@ -21,6 +28,7 @@ const NewCard = () => {
   const { path } = params;
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleGoBack = () => {
     switch (path) {
@@ -36,8 +44,22 @@ const NewCard = () => {
     }
   };
 
-  const onSubmit = () => {
-    setIsOpen(true);
+  const onSubmit = async (dataForm: CreditCardForm) => {
+    setIsLoading(true);
+    try {
+      const response = await api.post(`user/card`, {
+        number: dataForm.number,
+        validity: dataForm.validity,
+        cvv: dataForm.cvv,
+        name: dataForm.name,
+        user_id: user.id,
+      });
+      setIsOpen(true);
+    } catch (error) {
+      handleError('Não foi possível adicionar o cartão, tente mais tarde.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -82,12 +104,13 @@ const NewCard = () => {
           </View>
         </Row>
         <Input
-          name="cvv"
+          name="name"
           control={control}
           placeholder="Informe o nome no cartão"
           label="Nome no cartão"
           iconLeft={<CreditCardIcon />}
           containerStyle={styles.input}
+          autoCapitalize="words"
         />
         <Button onPress={handleSubmit(onSubmit)} style={{ marginTop: 56 }}>
           Salvar

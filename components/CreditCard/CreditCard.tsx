@@ -40,8 +40,9 @@ const CreditCard = ({ item }: ICreditCardProps) => {
         <IconWrapper>
           <CreditCardIcon />
         </IconWrapper>
-        <View style={{ flexDirection: 'row' }}>
-          <HideNumber>
+        <View>
+          <View style={{ flexDirection: 'row' }}>
+            {/* <HideNumber>
             <MaskNumber />
             <MaskNumber />
             <MaskNumber />
@@ -52,14 +53,16 @@ const CreditCard = ({ item }: ICreditCardProps) => {
             <MaskNumber />
             <MaskNumber />
             <MaskNumber />
-          </HideNumber>
-          <HideNumber>
+            </HideNumber>
+            <HideNumber>
             <MaskNumber />
             <MaskNumber />
             <MaskNumber />
             <MaskNumber />
-          </HideNumber>
-          <CardNumber>{item.number}</CardNumber>
+          </HideNumber> */}
+            <CardNumber>{item.number}</CardNumber>
+          </View>
+          <CardNumber>{item.name}</CardNumber>
         </View>
       </Row>
       <Row style={{ alignSelf: 'flex-end' }}>
