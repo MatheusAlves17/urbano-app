@@ -27,7 +27,6 @@ type FormData = {
 
 const Home = () => {
   const { user } = useAuth();
-  console.log('usuario', user);
 
   const { control, handleSubmit } = useForm<FormData>();
 

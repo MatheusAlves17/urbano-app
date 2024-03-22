@@ -29,6 +29,9 @@ export const LoginForm = forwardRef<BottomSheet, LoginFormProps>(
 
     const { control, handleSubmit } = useForm<FormLogin>({
       resolver: yupResolver(LoginSchema),
+      defaultValues: __DEV__
+        ? { email: 'matheus@gmail.com', password: 'Matt234@' }
+        : {},
     });
 
     const [isLoading, setIsLoading] = useState(false);
@@ -43,8 +46,6 @@ export const LoginForm = forwardRef<BottomSheet, LoginFormProps>(
         login(data);
         router.push('/Home/');
       } catch (error) {
-        console.log(JSON.stringify(error));
-
         handleError('Usuário e/ou senha inválidos');
       } finally {
         setIsLoading(false);

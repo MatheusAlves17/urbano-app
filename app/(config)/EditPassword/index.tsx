@@ -9,11 +9,15 @@ import { Button } from '@/components/Button/Button';
 import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
 import { useState } from 'react';
 import { router } from 'expo-router';
+import { PasswordForm, PasswordSchema } from '@/validation/Profile.validation';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { handleError } from '@/utils/handleError';
+import { api } from '@/services/api';
 import { Container } from './styles';
 
 const EditPassword = () => {
-  const { control, handleSubmit } = useForm({
-    // resolver: yupResolver(SignupSchema),
+  const { control, handleSubmit } = useForm<PasswordForm>({
+    resolver: yupResolver(PasswordSchema),
   });
 
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +27,19 @@ const EditPassword = () => {
     router.push('/Settings/');
   };
 
-  const onSubmit = () => {
+  const onSubmit = async (dataForm: PasswordForm) => {
+    const data = {
+      currentPassword: dataForm.currentPassword,
+      newPassword: dataForm.newPassword,
+      confirmNewPassword: dataForm.confirmNewPassword,
+    };
+
+    try {
+      const response = await api.put(`user/update/password`, data);
+      console.log(response);
+    } catch (error) {
+      handleError(error);
+    }
     setIsOpen(true);
   };
 
@@ -39,24 +55,27 @@ const EditPassword = () => {
           placeholder="********"
           password
           containerStyle={styles.input}
+          autoCapitalize="none"
         />
         <Input
           control={control}
-          name="password"
+          name="newPassword"
           iconLeft={<Lock />}
           label="Nova senha"
           placeholder="********"
           password
           containerStyle={styles.input}
+          autoCapitalize="none"
         />
         <Input
           control={control}
-          name="confirmPassword"
+          name="confirmNewPassword"
           iconLeft={<Lock />}
           label="Confirmação de senha"
           placeholder="********"
           password
           containerStyle={styles.input}
+          autoCapitalize="none"
         />
         <Button onPress={handleSubmit(onSubmit)} style={{ marginTop: 56 }}>
           Salvar nova senha

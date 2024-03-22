@@ -19,14 +19,13 @@ import { SignupForm, SignupSchema } from '@/validation/Signup.validation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { handleError } from '@/utils/handleError';
 import { api } from '@/services/api';
-import { deleteItemAsync } from 'expo-secure-store';
 import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
 import { Header, Title } from './styles';
 
 const Signup = () => {
   const router = useRouter();
 
-  const { control, handleSubmit, getValues } = useForm<SignupForm>({
+  const { control, handleSubmit } = useForm<SignupForm>({
     resolver: yupResolver(SignupSchema),
   });
 
@@ -35,8 +34,6 @@ const Signup = () => {
   const [isOpenSuccess, setIsOpenSuccess] = useState(false);
 
   const onSubmit = async (dataForm: SignupForm) => {
-    console.log('chamou pelo menos');
-
     setIsLoading(true);
 
     const data = {
@@ -48,11 +45,8 @@ const Signup = () => {
       password: dataForm.password,
     };
 
-    console.log(data);
-
     try {
       const response = await api.post(`user/signup`, data);
-      console.log(response);
       setIsOpenSuccess(true);
 
       router.push('/Login/');
