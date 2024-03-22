@@ -27,11 +27,14 @@ export interface User {
   name: string;
   phone: string;
   role: string;
+  email: string;
   token: string;
 }
 
 interface IUserProvider {
   user: User;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
+
   isAuthenticated: boolean;
   logout: () => Promise<void>;
   login: (user: User) => Promise<void>;
@@ -132,7 +135,7 @@ const AuthProvider = ({ children, isAppReady }: ChildrenProps) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, logout, login, loading }}
+      value={{ user, setUser, isAuthenticated, logout, login, loading }}
     >
       {children}
     </AuthContext.Provider>

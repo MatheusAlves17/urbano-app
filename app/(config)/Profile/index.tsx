@@ -2,12 +2,18 @@ import Header from '@/components/Header/Header';
 import { GlobalContainer } from '@/global/styles';
 import { router } from 'expo-router';
 import { Check, Document, Email, Pen, Smartphone, User } from '@/assets/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Input from '@/components/Input/Input';
 import { useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 import { theme } from '@/global/theme';
 import { shadow } from '@/global/shadow';
+import { useAuth } from '@/hooks/useAuth';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { handleError } from '@/utils/handleError';
+import { api } from '@/services/api';
+import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
+import { ProfileForm, ProfileSchema } from '@/validation/Profile.validation';
 import {
   Container,
   ErrorMessage,
@@ -19,14 +25,46 @@ import {
 } from './styles';
 
 const Profile = () => {
+  const { user, setUser } = useAuth();
+
   const [isEditing, setIsEditing] = useState(false);
-  const { control, handleSubmit } = useForm({
-    // resolver: yupResolver(SignupSchema),
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { control, handleSubmit, setValue } = useForm<ProfileForm>({
+    resolver: yupResolver(ProfileSchema),
   });
 
-  const onSubmit = () => {
+  const onSubmit = async (dataForm: ProfileForm) => {
     setIsEditing(false);
+
+    const data = {
+      name: dataForm.name,
+      cpf: dataForm.cpf,
+      email: dataForm.email,
+      phone: dataForm.phone,
+    };
+
+    try {
+      const response = await api.put(`user/update`, data);
+      setIsOpen(true);
+      setUser({ ...user, ...response.data });
+    } catch (error) {
+      handleError(
+        'Ocorreu um erro ao atualizar as informações, por favor tente mais tarde.',
+      );
+    } finally {
+      setIsEditing(false);
+    }
   };
+
+  useEffect(() => {
+    if (user) {
+      setValue('name', user.name);
+      setValue('cpf', user.cpf);
+      setValue('phone', user.phone);
+      setValue('email', user.email);
+    }
+  }, [user]);
 
   return (
     <GlobalContainer>
@@ -41,7 +79,7 @@ const Profile = () => {
             <Label>Nome completo</Label>
             <InputContainer style={{ ...shadow.default }}>
               <User />
-              <TextInput>Rodrigo Gonçalves</TextInput>
+              <TextInput>{user.name}</TextInput>
             </InputContainer>
             <ErrorMessage />
           </View>
@@ -49,7 +87,7 @@ const Profile = () => {
             <Label>CPF</Label>
             <InputContainer style={{ ...shadow.default }}>
               <Document />
-              <TextInput>123.456.789-90</TextInput>
+              <TextInput>{user.cpf}</TextInput>
             </InputContainer>
             <ErrorMessage />
           </View>
@@ -57,7 +95,7 @@ const Profile = () => {
             <Label>Telefone</Label>
             <InputContainer style={{ ...shadow.default }}>
               <Smartphone />
-              <TextInput>(11) 94002-8922</TextInput>
+              <TextInput>{user.phone}</TextInput>
             </InputContainer>
             <ErrorMessage />
           </View>
@@ -65,7 +103,7 @@ const Profile = () => {
             <Label>E-mail</Label>
             <InputContainer style={{ ...shadow.default }}>
               <Email />
-              <TextInput>rodrigo.gonçalves@gmail.com</TextInput>
+              <TextInput>{user.email}</TextInput>
             </InputContainer>
             <ErrorMessage />
           </View>
@@ -83,6 +121,7 @@ const Profile = () => {
             label="Nome completo"
             placeholder="Informe o nome completo"
             containerStyle={styles.input}
+            autoCapitalize="words"
           />
           <Input
             control={control}
@@ -115,6 +154,13 @@ const Profile = () => {
           />
         </Container>
       )}
+      <ModalSuccess
+        isOpen={isOpen}
+        isTransparent
+        title="Sucesso!"
+        description="Alteração de usuário foi salva."
+        onClose={() => setIsOpen(false)}
+      />
     </GlobalContainer>
   );
 };
