@@ -4,11 +4,12 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { shadow } from '@/global/shadow';
 import { Pen, Plus, Trash } from '@/assets/icons';
-import { TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { Button } from '@/components/Button/Button';
 import { handleError } from '@/utils/handleError';
 import { api } from '@/services/api';
 import CreditCard from '@/components/CreditCard/CreditCard';
+import { theme } from '@/global/theme';
 import { Container, EditButton, Row } from './styles';
 
 export interface Card {
@@ -25,19 +26,24 @@ export interface Card {
 const MyCards = () => {
   const [cards, setCards] = useState<Card[]>([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleNewCard = () => {
     router.push({
       pathname: '/NewCard/',
-      params: { path: 'MyCards' },
+      params: { path: 'MyCards', card_id: 'false' },
     });
   };
 
   const getCards = async () => {
+    setIsLoading(true);
     try {
       const response = await api.get(`user/cards`);
       setCards(response.data);
     } catch (error) {
       handleError('Não foi possível encontrar seus cartões, tente mais tarde.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -55,11 +61,17 @@ const MyCards = () => {
             <Plus />
           </EditButton>
         </Row>
-        {cards.map(item => (
-          <CreditCard item={item} />
-        ))}
-        {cards.length < 1 && (
-          <GlobalText>Não há encontramos cartões cadastrado</GlobalText>
+        {isLoading ? (
+          <ActivityIndicator color={theme.colors.primary_01} size={24} />
+        ) : (
+          <View>
+            {cards.map(item => (
+              <CreditCard item={item} key={item.id} />
+            ))}
+            {cards.length < 1 && (
+              <GlobalText>Não há encontramos cartões cadastrado</GlobalText>
+            )}
+          </View>
         )}
       </Container>
     </GlobalContainer>

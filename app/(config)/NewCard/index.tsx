@@ -2,7 +2,7 @@ import Header from '@/components/Header/Header';
 import { GlobalContainer } from '@/global/styles';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Input from '@/components/Input/Input';
 import { CreditCardIcon } from '@/assets/icons';
 import { StyleSheet, View } from 'react-native';
@@ -19,15 +19,16 @@ import { Container, Row } from './styles';
 const NewCard = () => {
   const { user } = useAuth();
 
-  const { control, handleSubmit } = useForm<CreditCardForm>({
+  const { control, handleSubmit, setValue } = useForm<CreditCardForm>({
     resolver: yupResolver(CreditCardSchema),
   });
 
   const params = useLocalSearchParams();
 
-  const { path } = params;
+  const { path, card_id } = params;
 
   const [isOpen, setIsOpen] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoBack = () => {
@@ -44,7 +45,26 @@ const NewCard = () => {
     }
   };
 
-  const onSubmit = async (dataForm: CreditCardForm) => {
+  const onSubmitEditCard = async (dataForm: CreditCardForm) => {
+    setIsLoading(true);
+    try {
+      const response = await api.put(`user/card`, {
+        id: card_id,
+        number: dataForm.number,
+        validity: dataForm.validity,
+        cvv: dataForm.cvv,
+        name: dataForm.name,
+        user_id: user.id,
+      });
+      setIsOpen(true);
+    } catch (error) {
+      handleError('Não foi possível adicionar o cartão, tente mais tarde.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmitNewCard = async (dataForm: CreditCardForm) => {
     setIsLoading(true);
     try {
       const response = await api.post(`user/card`, {
@@ -61,6 +81,24 @@ const NewCard = () => {
       setIsLoading(false);
     }
   };
+
+  const getCard = async () => {
+    try {
+      const response = await api.get(`user/card`);
+      setValue('number', response.data.number);
+      setValue('validity', response.data.validity);
+      setValue('cvv', response.data.cvv);
+      setValue('name', response.data.name);
+    } catch (error) {
+      handleError('Não foi possível encontrar o cartão');
+    }
+  };
+
+  useEffect(() => {
+    if (card_id !== 'false') {
+      getCard();
+    }
+  });
 
   return (
     <GlobalContainer>
@@ -112,9 +150,23 @@ const NewCard = () => {
           containerStyle={styles.input}
           autoCapitalize="words"
         />
-        <Button onPress={handleSubmit(onSubmit)} style={{ marginTop: 56 }}>
-          Salvar
-        </Button>
+        {card_id !== 'false' ? (
+          <Button
+            onPress={handleSubmit(onSubmitEditCard)}
+            style={{ marginTop: 56 }}
+            isLoading={isLoading}
+          >
+            Editar
+          </Button>
+        ) : (
+          <Button
+            onPress={handleSubmit(onSubmitNewCard)}
+            style={{ marginTop: 56 }}
+            isLoading={isLoading}
+          >
+            Salvar
+          </Button>
+        )}
       </Container>
       <ModalSuccess
         isOpen={isOpen}

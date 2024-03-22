@@ -35,7 +35,7 @@ const CreditCard = ({ item }: ICreditCardProps) => {
   };
 
   return (
-    <Card style={{ ...shadow.default }}>
+    <Card style={{ ...shadow.default }} key={item.id}>
       <Row>
         <IconWrapper>
           <CreditCardIcon />
