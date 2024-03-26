@@ -8,7 +8,7 @@ import { Pin } from '@/assets/icons';
 import { getAddressByCep } from '@/utils/getAddressByCep';
 import { Button } from '@/components/Button/Button';
 import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AddressForm, AddressSchema } from '@/validation/Address.validation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ScrollView } from 'react-native';
@@ -64,11 +64,49 @@ const NewAddress = () => {
         type: dataForm.type,
       });
       setIsOpen(true);
-      // handleGoBack();
     } catch (error) {
       handleError('Não foi possível salvar o endereço, tente mais tarde.');
     }
   };
+
+  const onSubmitEditAddress = async (dataForm: AddressForm) => {
+    try {
+      const response = await api.put(`user/address`, {
+        id: address_id,
+        street: dataForm.street,
+        number: dataForm.number,
+        district: dataForm.district,
+        city: dataForm.city,
+        state: dataForm.state,
+        zipCode: dataForm.zipCode,
+        type: dataForm.type,
+      });
+      setIsOpen(true);
+    } catch (error) {
+      handleError('Não foi possível salvar o endereço, tente mais tarde.');
+    }
+  };
+
+  const getAddress = async () => {
+    try {
+      const response = await api.get(`user/address?address_id=${address_id}`);
+      setValue('zipCode', response.data.zipCode);
+      setValue('street', response.data.street);
+      setValue('number', response.data.number);
+      setValue('district', response.data.district);
+      setValue('city', response.data.city);
+      setValue('state', response.data.state);
+      setValue('type', response.data.type);
+    } catch (error) {
+      handleError('Endereço indisponível, tente mais tarde.');
+    }
+  };
+
+  useEffect(() => {
+    if (address_id !== 'false') {
+      getAddress();
+    }
+  }, [address_id]);
 
   return (
     <GlobalContainer>
@@ -140,7 +178,10 @@ const NewAddress = () => {
           />
 
           {address_id !== 'false' ? (
-            <Button onPress={handleSubmit(onSubmit)} style={{ marginTop: 32 }}>
+            <Button
+              onPress={handleSubmit(onSubmitEditAddress)}
+              style={{ marginTop: 32 }}
+            >
               Editar
             </Button>
           ) : (
