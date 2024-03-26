@@ -36,8 +36,6 @@ const Profile = () => {
   });
 
   const onSubmit = async (dataForm: ProfileForm) => {
-    setIsEditing(false);
-
     const data = {
       name: dataForm.name,
       cpf: dataForm.cpf,
@@ -49,6 +47,7 @@ const Profile = () => {
       const response = await api.put(`user/update`, data);
       setIsOpen(true);
       setUser({ ...user, ...response.data });
+      console.log(response.data);
     } catch (error) {
       handleError(
         'Ocorreu um erro ao atualizar as informações, por favor tente mais tarde.',
@@ -74,7 +73,7 @@ const Profile = () => {
         <Container>
           <Row onPress={() => setIsEditing(true)}>
             <Subtitle>Editar perfil</Subtitle>
-            <EditButton>
+            <EditButton onPress={() => setIsEditing(true)}>
               <Pen />
             </EditButton>
           </Row>
@@ -115,7 +114,7 @@ const Profile = () => {
         <Container>
           <Row onPress={handleSubmit(onSubmit)}>
             <Subtitle>Editar perfil</Subtitle>
-            <EditButton>
+            <EditButton onPress={handleSubmit(onSubmit)}>
               <Check />
             </EditButton>
           </Row>

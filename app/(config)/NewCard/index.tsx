@@ -14,6 +14,7 @@ import { api } from '@/services/api';
 import { CreditCardForm, CreditCardSchema } from '@/validation/Card.validation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@/hooks/useAuth';
+import { prettyLog } from '@/services/prettyLog';
 import { Container, Row } from './styles';
 
 const NewCard = () => {
@@ -73,9 +74,12 @@ const NewCard = () => {
         cvv: dataForm.cvv,
         name: dataForm.name,
         user_id: user.id,
+        flag: dataForm.flag,
       });
       setIsOpen(true);
     } catch (error) {
+      prettyLog(error);
+
       handleError('Não foi possível adicionar o cartão, tente mais tarde.');
     } finally {
       setIsLoading(false);
@@ -88,6 +92,7 @@ const NewCard = () => {
       setValue('number', response.data.number);
       setValue('validity', response.data.validity);
       setValue('cvv', response.data.cvv);
+      setValue('flag', response.data.flag);
       setValue('name', response.data.name);
     } catch (error) {
       handleError('Não foi possível encontrar o cartão');
@@ -141,6 +146,15 @@ const NewCard = () => {
             />
           </View>
         </Row>
+        <Input
+          name="flag"
+          control={control}
+          placeholder="Informe a bandeira do cartão"
+          label="Bandeira do cartão"
+          iconLeft={<CreditCardIcon />}
+          containerStyle={styles.input}
+          autoCapitalize="words"
+        />
         <Input
           name="name"
           control={control}

@@ -7,6 +7,8 @@ import { Pen, PinLight, Plus, Trash } from '@/assets/icons';
 import { TouchableOpacity } from 'react-native';
 import { handleError } from '@/utils/handleError';
 import { api } from '@/services/api';
+import AddressCard from '@/components/AddressCard/AddressCard';
+import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
 import {
   AddressText,
   Card,
@@ -33,6 +35,12 @@ export interface MyAddress {
 const Addresses = () => {
   const [address, setAddress] = useState<MyAddress[]>([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+
   const handleEditAddress = (address_id: string) => {
     router.push({
       pathname: '/NewAddress/NewAddress',
@@ -47,6 +55,25 @@ const Addresses = () => {
     } catch (error) {
       handleError('Não foi possível encontrar seus endereços');
     }
+  };
+
+  const handleDeleteAddress = async (address_id: string) => {
+    setIsDeleteLoading(true);
+    try {
+      const response = await api.delete(
+        `user/address?address_id=${address_id}`,
+      );
+      setIsSuccess(true);
+    } catch (error) {
+      handleError('Falha ao excluir cartão de crédito, tente mais tarde.');
+    } finally {
+      setIsDeleteLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsSuccess(false);
+    getAddress();
   };
 
   useEffect(() => {
@@ -64,35 +91,24 @@ const Addresses = () => {
           </EditButton>
         </Row>
         {address.map(item => (
-          <Card style={{ ...shadow.default }} key={item.id}>
-            <Row>
-              <IconWrapper>
-                <PinLight />
-              </IconWrapper>
-              <AddressText>
-                {item.street}, {item.number}, {item.zipCode}, {item.city} -{' '}
-                {item.state}
-              </AddressText>
-              <AddressText>{item.type}</AddressText>
-            </Row>
-            <Row style={{ alignSelf: 'flex-end' }}>
-              <TouchableOpacity onPress={() => handleEditAddress(item.id)}>
-                <IconWrapper>
-                  <Pen />
-                </IconWrapper>
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <IconWrapper>
-                  <Trash />
-                </IconWrapper>
-              </TouchableOpacity>
-            </Row>
-          </Card>
+          <AddressCard
+            item={item}
+            onDelete={handleDeleteAddress}
+            key={item.id}
+            loading={isDeleteLoading}
+          />
         ))}
         {address.length === 0 && (
           <GlobalText>Não há endereços cadastrados</GlobalText>
         )}
       </Container>
+      <ModalSuccess
+        isOpen={isSuccess}
+        title="Sucesso"
+        description="Endereço excluído"
+        isTransparent
+        onClose={handleCloseModal}
+      />
     </GlobalContainer>
   );
 };

@@ -19,6 +19,7 @@ export interface Card {
   cvv: string;
   validity: string;
   name: string;
+  flag: string;
   created_at: Date;
   updated_at: Date;
   user_id: string;

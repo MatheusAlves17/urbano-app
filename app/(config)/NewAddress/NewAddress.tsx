@@ -14,6 +14,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { ScrollView } from 'react-native';
 import { handleError } from '@/utils/handleError';
 import { api } from '@/services/api';
+import { prettyLog } from '@/services/prettyLog';
 import { Container } from './styles';
 
 const NewAddress = () => {
@@ -97,6 +98,7 @@ const NewAddress = () => {
       setValue('city', response.data.city);
       setValue('state', response.data.state);
       setValue('type', response.data.type);
+      prettyLog(response.data);
     } catch (error) {
       handleError('Endereço indisponível, tente mais tarde.');
     }

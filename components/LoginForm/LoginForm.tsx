@@ -30,7 +30,7 @@ export const LoginForm = forwardRef<BottomSheet, LoginFormProps>(
     const { control, handleSubmit } = useForm<FormLogin>({
       resolver: yupResolver(LoginSchema),
       defaultValues: __DEV__
-        ? { email: 'matheus@gmail.com', password: 'Matt234@' }
+        ? { email: 'matheus@gmail.com', password: 'Matt123#' }
         : {},
     });
 
