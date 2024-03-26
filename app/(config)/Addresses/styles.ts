@@ -23,6 +23,19 @@ export const Row = styled.View`
   align-items: center;
 `;
 
+export const EditButton = styled.TouchableOpacity.attrs({
+  activeOpacity: 0.5,
+})`
+  width: 40px;
+  height: 40px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 32px;
+  background-color: ${({ theme }) => theme.colors.white_02};
+`;
+
 export const IconWrapper = styled.View`
   width: 40px;
   height: 40px;

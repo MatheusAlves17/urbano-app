@@ -13,7 +13,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'react-native';
 import { theme } from '@/global/theme';
 import { handleError } from '@/utils/handleError';
-import { api } from '@/services/api';
+import { api, imageURL } from '@/services/api';
 import { formatCurrency } from '@/utils/format';
 import {
   Category,
@@ -74,7 +74,10 @@ const ProductDetails = () => {
             onPress={() => router.push('/Home/')}
           />
           <ImageContainer>
-            <ImageProduct source={Clock01} contentFit="contain" />
+            <ImageProduct
+              source={{ uri: `${imageURL}${product?.banner}` }}
+              contentFit="contain"
+            />
           </ImageContainer>
           <Content>
             <Category>{product?.category.name}</Category>

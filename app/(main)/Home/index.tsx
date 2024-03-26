@@ -1,12 +1,13 @@
 import { useForm } from 'react-hook-form';
 import { GlobalContainer, GlobalScrollView } from '@/global/styles';
-import { ArrowDown, Bell, Pin, Search } from '@/assets/icons';
+import { ArrowDown, Bell, Pin, Search, User } from '@/assets/icons';
 import Input from '@/components/Input/Input';
 import { theme } from '@/global/theme';
 import { Clock01 } from '@/assets/pictures';
 import { View } from 'react-native';
 import ListCategory from '@/components/ListCategory/ListCategory';
 import Catalog from '@/components/Catalog/Catalog';
+import { useAuth } from '@/hooks/useAuth';
 import {
   AddressContainer,
   AddressLabel,
@@ -25,6 +26,7 @@ type FormData = {
 };
 
 const Home = () => {
+  const { user } = useAuth();
   const { control, handleSubmit } = useForm<FormData>();
 
   const onSubmit = (data: FormData) => {
@@ -37,11 +39,9 @@ const Home = () => {
       <GlobalContainer>
         <Header>
           <AddressContainer>
-            <AddressLabel>Endereço de entrega</AddressLabel>
+            <AddressLabel>Olá, seja bem-vindo</AddressLabel>
             <Row>
-              <Pin />
-              <AddressText>Mogi das Cruzes</AddressText>
-              <ArrowDown />
+              <AddressText>{user.name}</AddressText>
             </Row>
           </AddressContainer>
           <NotificationButton>
@@ -58,7 +58,12 @@ const Home = () => {
             onSubmitEditing={handleSubmit(onSubmit)}
           />
           <Highlight>
-            <HightlightImage source={Clock01} contentFit="contain" />
+            <HightlightImage
+              source={{
+                uri: 'https://beco-back.onrender.com/files/5863b9e103244bd684ad2f18fbdd6891-relogio-azul.png',
+              }}
+              contentFit="contain"
+            />
             <View>
               <AddressLabel>Destaque da semana</AddressLabel>
               <HighlightTitle>

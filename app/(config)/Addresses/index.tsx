@@ -1,35 +1,37 @@
 import Header from '@/components/Header/Header';
-import { GlobalContainer, GlobalSubtitle } from '@/global/styles';
+import { GlobalContainer, GlobalSubtitle, GlobalText } from '@/global/styles';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { shadow } from '@/global/shadow';
-import { Pen, PinLight, Trash } from '@/assets/icons';
+import { Pen, PinLight, Plus, Trash } from '@/assets/icons';
 import { TouchableOpacity } from 'react-native';
-import { AddressText, Card, Container, IconWrapper, Row } from './styles';
+import { handleError } from '@/utils/handleError';
+import { api } from '@/services/api';
+import {
+  AddressText,
+  Card,
+  Container,
+  EditButton,
+  IconWrapper,
+  Row,
+} from './styles';
 
-const myAddress = [
-  {
-    id: '1',
-    street: 'Rua Valentim Faustini',
-    number: '16',
-    district: 'Braz Cubas',
-    city: 'Mogi das Cruzes',
-    zipcode: '00000-000',
-    state: 'Sp',
-  },
-  {
-    id: '2',
-    street: 'Rua Jornalista Cândido Motta Filho',
-    number: '16',
-    district: 'Presidente Dutra',
-    city: 'Ribeirão Preto',
-    zipcode: '14060-760',
-    state: 'Sp',
-  },
-];
+export interface MyAddress {
+  id: string;
+  zipCode: string;
+  street: string;
+  number: string;
+  district: string;
+  city: string;
+  state: string;
+  type?: string;
+  created_at: Date;
+  updated_at: Date;
+  user_id: string;
+}
 
 const Addresses = () => {
-  const [address, setAddress] = useState(myAddress);
+  const [address, setAddress] = useState<MyAddress[]>([]);
 
   const handleEditAddress = (address_id: string) => {
     router.push({
@@ -38,8 +40,13 @@ const Addresses = () => {
     });
   };
 
-  const getAddress = () => {
-    // faz a busca dos endereços, se não tiver redireciona
+  const getAddress = async () => {
+    try {
+      const response = await api.get(`user/all-address`);
+      setAddress(response.data);
+    } catch (error) {
+      handleError('Não foi possível encontrar seus endereços');
+    }
   };
 
   useEffect(() => {
@@ -50,7 +57,12 @@ const Addresses = () => {
     <GlobalContainer>
       <Header onPress={() => router.push('/Settings/')} title="Endereços" />
       <Container>
-        <GlobalSubtitle>Seus endereços</GlobalSubtitle>
+        <Row style={{ justifyContent: 'space-between' }}>
+          <GlobalSubtitle>Meus endereços</GlobalSubtitle>
+          <EditButton onPress={() => handleEditAddress('false')}>
+            <Plus />
+          </EditButton>
+        </Row>
         {address.map(item => (
           <Card style={{ ...shadow.default }} key={item.id}>
             <Row>
@@ -58,9 +70,10 @@ const Addresses = () => {
                 <PinLight />
               </IconWrapper>
               <AddressText>
-                {item.street}, {item.number}, {item.zipcode}, {item.city} -{' '}
+                {item.street}, {item.number}, {item.zipCode}, {item.city} -{' '}
                 {item.state}
               </AddressText>
+              <AddressText>{item.type}</AddressText>
             </Row>
             <Row style={{ alignSelf: 'flex-end' }}>
               <TouchableOpacity onPress={() => handleEditAddress(item.id)}>
@@ -76,6 +89,9 @@ const Addresses = () => {
             </Row>
           </Card>
         ))}
+        {address.length === 0 && (
+          <GlobalText>Não há endereços cadastrados</GlobalText>
+        )}
       </Container>
     </GlobalContainer>
   );

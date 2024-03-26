@@ -42,8 +42,11 @@ export const LoginForm = forwardRef<BottomSheet, LoginFormProps>(
           email: dataForm.email,
           password: dataForm.password,
         });
+
         setIsLoading(true);
+
         login(data);
+
         router.push('/Home/');
       } catch (error) {
         handleError('Usuário e/ou senha inválidos');

@@ -75,10 +75,10 @@ const MyCards = () => {
 
   return (
     <GlobalContainer>
-      <Header onPress={() => router.push('/Settings/')} title="Endereços" />
+      <Header onPress={() => router.push('/Settings/')} title="Cartões" />
       <Container>
         <Row>
-          <GlobalSubtitle>Seus enderços</GlobalSubtitle>
+          <GlobalSubtitle>Meus cartões</GlobalSubtitle>
           <EditButton onPress={handleNewCard}>
             <Plus />
           </EditButton>

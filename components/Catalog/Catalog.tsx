@@ -4,7 +4,7 @@ import { Clock01, ClockCategories } from '@/assets/pictures';
 import { formatCurrency } from '@/utils/format';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { api } from '@/services/api';
+import { api, imageURL } from '@/services/api';
 import { prettyLog } from '@/services/prettyLog';
 import { handleError } from '@/utils/handleError';
 import { Card, CardImage, Content, ItemsContainer, Row } from './styles';
@@ -49,13 +49,19 @@ const Catalog = () => {
       <ItemsContainer>
         {products.map(item => (
           <Card key={item.id} onPress={() => handleGoTo(item.id)}>
-            <CardImage source={item.banner} contentFit="contain" />
+            <CardImage
+              source={{ uri: `${imageURL}${item.banner}` }}
+              contentFit="contain"
+            />
             <Row>
               <GlobalText>{item.name}</GlobalText>
               <GlobalLink>{formatCurrency(parseFloat(item.price))}</GlobalLink>
             </Row>
           </Card>
         ))}
+        {products.length === 0 && (
+          <GlobalText>Não há produtos disponíveis</GlobalText>
+        )}
       </ItemsContainer>
     </Content>
   );
