@@ -19,6 +19,7 @@ interface Card {
   validity: string;
   name: string;
   flag: string;
+  principal: boolean;
   created_at: Date;
   updated_at: Date;
   user_id: string;
@@ -40,36 +41,16 @@ const CreditCard = ({ item, loading, onDelete }: ICreditCardProps) => {
 
   return (
     <Card style={{ ...shadow.default }} key={item.id}>
+      {/* <Row> */}
+      <IconWrapper>
+        <CreditCardIcon />
+      </IconWrapper>
+      {/* </Row> */}
+      <CardNumber>{item.number}</CardNumber>
       <Row>
-        <IconWrapper>
-          <CreditCardIcon />
-        </IconWrapper>
-        <View>
-          <View style={{ flexDirection: 'row' }}>
-            {/* <HideNumber>
-            <MaskNumber />
-            <MaskNumber />
-            <MaskNumber />
-            <MaskNumber />
-          </HideNumber>
-          <HideNumber>
-            <MaskNumber />
-            <MaskNumber />
-            <MaskNumber />
-            <MaskNumber />
-            </HideNumber>
-            <HideNumber>
-            <MaskNumber />
-            <MaskNumber />
-            <MaskNumber />
-            <MaskNumber />
-          </HideNumber> */}
-            <CardNumber>{item.number}</CardNumber>
-          </View>
-          <CardNumber>{item.name}</CardNumber>
-        </View>
-      </Row>
-      <Row style={{ alignSelf: 'flex-end' }}>
+        <CardNumber style={{ alignSelf: 'center' }}>
+          {item.principal && 'Principal |'} {item.name}
+        </CardNumber>
         <TouchableOpacity onPress={handleEditCard}>
           <IconWrapper>
             <Pen />

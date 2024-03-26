@@ -11,6 +11,7 @@ import { api } from '@/services/api';
 import CreditCard from '@/components/CreditCard/CreditCard';
 import { theme } from '@/global/theme';
 import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
+import { prettyLog } from '@/services/prettyLog';
 import { Container, EditButton, Row } from './styles';
 
 export interface Card {
@@ -20,6 +21,7 @@ export interface Card {
   validity: string;
   name: string;
   flag: string;
+  principal: boolean;
   created_at: Date;
   updated_at: Date;
   user_id: string;
@@ -46,6 +48,7 @@ const MyCards = () => {
     try {
       const response = await api.get(`user/cards`);
       setCards(response.data);
+      prettyLog(cards);
     } catch (error) {
       handleError('Não foi possível encontrar seus cartões, tente mais tarde.');
     } finally {

@@ -1,5 +1,5 @@
 import Header from '@/components/Header/Header';
-import { GlobalContainer } from '@/global/styles';
+import { GlobalContainer, GlobalText } from '@/global/styles';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useForm } from 'react-hook-form';
 import { useEffect, useState } from 'react';
@@ -15,7 +15,8 @@ import { CreditCardForm, CreditCardSchema } from '@/validation/Card.validation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@/hooks/useAuth';
 import { prettyLog } from '@/services/prettyLog';
-import { Container, Row } from './styles';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Checkbox, CheckboxContainer, Container, Row } from './styles';
 
 const NewCard = () => {
   const { user } = useAuth();
@@ -31,6 +32,8 @@ const NewCard = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isChecked, setIsChecked] = useState(false);
 
   const handleGoBack = () => {
     switch (path) {
@@ -75,6 +78,7 @@ const NewCard = () => {
         name: dataForm.name,
         user_id: user.id,
         flag: dataForm.flag,
+        principal: isChecked,
       });
       setIsOpen(true);
     } catch (error) {
@@ -164,6 +168,21 @@ const NewCard = () => {
           containerStyle={styles.input}
           autoCapitalize="words"
         />
+        <CheckboxContainer>
+          <Checkbox
+            isChecked={isChecked}
+            onPress={() => setIsChecked(!isChecked)}
+          >
+            <MaterialCommunityIcons
+              name="check"
+              size={16}
+              color={
+                isChecked ? theme.colors.background : theme.colors.primary_01
+              }
+            />
+          </Checkbox>
+          <GlobalText>Esse é meu cartão principal</GlobalText>
+        </CheckboxContainer>
         {card_id !== 'false' ? (
           <Button
             onPress={handleSubmit(onSubmitEditCard)}

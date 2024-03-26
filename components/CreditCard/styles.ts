@@ -2,7 +2,7 @@ import styled from 'styled-components/native';
 
 export const Card = styled.View`
   width: 100%;
-  height: 110px;
+  height: 150px;
 
   padding: 16px;
 
@@ -24,7 +24,7 @@ export const IconWrapper = styled.View`
 
   align-items: center;
   justify-content: center;
-  margin-right: 16px;
+  margin-bottom: 16px;
 
   border-radius: 32px;
   background-color: ${({ theme }) => theme.colors.white_02};
