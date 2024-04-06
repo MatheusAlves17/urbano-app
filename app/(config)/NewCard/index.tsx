@@ -28,6 +28,7 @@ const NewCard = () => {
   const params = useLocalSearchParams();
 
   const { path, card_id } = params;
+  console.log(card_id);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,6 +37,8 @@ const NewCard = () => {
   const [isChecked, setIsChecked] = useState(false);
 
   const handleGoBack = () => {
+    setIsChecked(false);
+    setIsLoading(false);
     switch (path) {
       case 'Payment':
         router.push('/Payment/Payment');
@@ -59,6 +62,7 @@ const NewCard = () => {
         cvv: dataForm.cvv,
         name: dataForm.name,
         user_id: user.id,
+        principal: isChecked,
       });
       setIsOpen(true);
     } catch (error) {
@@ -92,7 +96,7 @@ const NewCard = () => {
 
   const getCard = async () => {
     try {
-      const response = await api.get(`user/card`);
+      const response = await api.get(`user/card?card_id=${card_id}`);
       setValue('number', response.data.number);
       setValue('validity', response.data.validity);
       setValue('cvv', response.data.cvv);

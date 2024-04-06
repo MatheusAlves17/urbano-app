@@ -28,7 +28,7 @@ interface IAddressProps {
 const AddressCard = ({ item, loading, onDelete }: IAddressProps) => {
   const handleEditCard = () => {
     router.push({
-      pathname: '/Addresses/',
+      pathname: '/NewAddress/NewAddress',
       params: { address_id: item.id, path: 'Addresses' },
     });
   };
@@ -41,10 +41,11 @@ const AddressCard = ({ item, loading, onDelete }: IAddressProps) => {
         </IconWrapper>
         <AddressText>
           {item.street}, {item.number}, {item.zipCode}, {item.city} -{' '}
-          {item.state} {item.type}
+          {item.state}
         </AddressText>
       </Row>
-      <Row style={{ alignSelf: 'flex-end' }}>
+      <Row>
+        <AddressText>{item.type}</AddressText>
         <TouchableOpacity onPress={handleEditCard}>
           <IconWrapper>
             <Pen />

@@ -48,9 +48,7 @@ const CreditCard = ({ item, loading, onDelete }: ICreditCardProps) => {
       {/* </Row> */}
       <CardNumber>{item.number}</CardNumber>
       <Row>
-        <CardNumber style={{ alignSelf: 'center' }}>
-          {item.principal && 'Principal |'} {item.name}
-        </CardNumber>
+        <CardNumber style={{ alignSelf: 'center' }}>{item.name}</CardNumber>
         <TouchableOpacity onPress={handleEditCard}>
           <IconWrapper>
             <Pen />

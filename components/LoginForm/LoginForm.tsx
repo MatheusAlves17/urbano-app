@@ -29,9 +29,9 @@ export const LoginForm = forwardRef<BottomSheet, LoginFormProps>(
 
     const { control, handleSubmit } = useForm<FormLogin>({
       resolver: yupResolver(LoginSchema),
-      defaultValues: __DEV__
-        ? { email: 'matheus@gmail.com', password: 'Matt123#' }
-        : {},
+      // defaultValues: __DEV__
+      //   ? { email: 'matheus@gmail.com', password: 'Matt123#' }
+      //        : {},
     });
 
     const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +83,7 @@ export const LoginForm = forwardRef<BottomSheet, LoginFormProps>(
             iconLeft={<Lock />}
             onSubmitEditing={handleSubmit(onSubmit)}
           />
-          <TextLink>Esqueci a senha</TextLink>
+          <TextLink />
           <Button isLoading={isLoading} onPress={handleSubmit(onSubmit)}>
             Fazer login
           </Button>
