@@ -6,6 +6,8 @@ import BottomSheet from '@gorhom/bottom-sheet';
 
 import { forwardRef } from 'react';
 import { useRouter } from 'expo-router';
+import { formatCurrency } from '@/utils/format';
+import { useCart } from '@/hooks/useCart';
 import {
   Container,
   Divider,
@@ -19,12 +21,25 @@ import { Button } from '../Button/Button';
 
 interface SummaryProps {
   onClose?: () => void;
-  paymentScreen?: boolean;
+  paymentScreen: string;
 }
 
 const Summary = forwardRef<BottomSheet, SummaryProps>(
   ({ onClose, paymentScreen }, ref) => {
     const router = useRouter();
+
+    const { addressId, valueTotal } = useCart();
+
+    const handleGoTo = () => {
+      switch (paymentScreen) {
+        case 'Basket':
+          router.push('/Payment/Payment');
+          break;
+        default:
+          router.push('/PurchaseSuccess/PurchaseSuccess');
+          break;
+      }
+    };
 
     return (
       <BottomSheet index={0} snapPoints={[10, 600]} ref={ref}>
@@ -49,9 +64,14 @@ const Summary = forwardRef<BottomSheet, SummaryProps>(
               <IconWrapper>
                 <PinLight />
               </IconWrapper>
+
               <View>
                 <Title>Endereço</Title>
-                <Span>3 salvos</Span>
+                <Span>
+                  {addressId
+                    ? 'Endereço selecionado'
+                    : 'Escolha o endereço de entrega'}
+                </Span>
               </View>
             </View>
             <TouchableOpacity
@@ -68,7 +88,7 @@ const Summary = forwardRef<BottomSheet, SummaryProps>(
           <Title>Resumo da compra</Title>
           <Row>
             <Subtitle>Subtotal</Subtitle>
-            <Subtitle>R$ 620.85</Subtitle>
+            <Subtitle>{formatCurrency(valueTotal)}</Subtitle>
           </Row>
           <Row>
             <Subtitle>Cupom aplicado</Subtitle>
@@ -79,34 +99,28 @@ const Summary = forwardRef<BottomSheet, SummaryProps>(
             <Subtitle>- R$ 20</Subtitle>
           </Row>
 
-          {paymentScreen && (
-            <View>
-              <Title>Resumo do pagamento</Title>
-              <Row>
-                <Subtitle># 0235</Subtitle>
-                <Subtitle>- R$ 250</Subtitle>
-              </Row>
-              <Row>
-                <Subtitle># 3542</Subtitle>
-                <Subtitle>- R$ 250</Subtitle>
-              </Row>
-            </View>
-          )}
+          {/* {paymentScreen && (
+          <View>
+            <Title>Resumo do pagamento</Title>
+            <Row>
+              <Subtitle># 0235</Subtitle>
+              <Subtitle>- R$ 250</Subtitle>
+            </Row>
+            <Row>
+              <Subtitle># 3542</Subtitle>
+              <Subtitle>- R$ 250</Subtitle>
+            </Row>
+          </View>
+        )} */}
+
           <Divider style={{ marginTop: 16 }} />
           <Row>
             <Title style={{ marginTop: 0 }}>Total</Title>
-            <Title style={{ marginTop: 0 }}>- R$ 520,00</Title>
+            <Title style={{ marginTop: 0 }}>{formatCurrency(valueTotal)}</Title>
           </Row>
           <Divider />
 
-          <Button
-            style={{ marginTop: 30 }}
-            onPress={() => {
-              paymentScreen
-                ? router.push('/PurchaseSuccess/PurchaseSuccess')
-                : router.push('/Payment/Payment');
-            }}
-          >
+          <Button style={{ marginTop: 30 }} onPress={handleGoTo}>
             Continuar
           </Button>
         </Container>

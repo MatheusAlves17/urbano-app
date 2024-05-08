@@ -1,31 +1,17 @@
 import Header from '@/components/Header/Header';
-import {
-  GlobalContainer,
-  GlobalScrollView,
-  GlobalSubtitle,
-  GlobalTitle,
-} from '@/global/styles';
-import { Clock01 } from '@/assets/pictures';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
-import { ArrowDown, ArrowLeft, Less, Plus } from '@/assets/icons';
-import { useRef, useState } from 'react';
+import { GlobalContainer, GlobalSubtitle, GlobalText } from '@/global/styles';
+import { ArrowDown } from '@/assets/icons';
+import { useRef } from 'react';
 import Summary from '@/components/Summary/Summary';
-import { height, width } from '@/global/constants';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { router } from 'expo-router';
-import {
-  ActionsRow,
-  CardContainer,
-  CardPrice,
-  CardQuantity,
-  CardTitle,
-  Content,
-  ImageContainer,
-  ProductImage,
-} from './styles';
+import { CartCard } from '@/components/CartCard/CartCard';
+import { useCart } from '@/hooks/useCart';
+import { IProduct } from '@/interfaces/Product';
+import { Content } from './styles';
 
 const Basket = () => {
-  const [count, setCount] = useState(1);
+  const { cartItems } = useCart();
   const summaryRef = useRef<BottomSheet | null>(null);
 
   const handleOpenForm = () => {
@@ -41,31 +27,18 @@ const Basket = () => {
       <Header title="Cesta de produtos" onPress={() => router.back()} />
       <Content>
         <GlobalSubtitle>Itens adicionados</GlobalSubtitle>
-        <CardContainer>
-          <ImageContainer>
-            <ProductImage source={Clock01} contentFit="contain" />
-          </ImageContainer>
-          <View style={{ width: '70%' }}>
-            <CardTitle>Relógio Saint Germain Bronx</CardTitle>
-            <CardPrice>R$ {(count * 148.9).toFixed(2)}</CardPrice>
-          </View>
-          <ActionsRow>
-            <TouchableOpacity
-              onPress={() => {
-                count >= 1 && setCount(count - 1);
-              }}
-            >
-              <Less />
-            </TouchableOpacity>
-            <CardQuantity>{count}</CardQuantity>
-            <TouchableOpacity onPress={() => setCount(count + 1)}>
-              <Plus />
-            </TouchableOpacity>
-          </ActionsRow>
-        </CardContainer>
+        {cartItems.length > 0 ? (
+          cartItems.map((item: IProduct) => <CartCard item={item} />)
+        ) : (
+          <GlobalText>Seu carrinho ainda está vazio</GlobalText>
+        )}
       </Content>
       <ArrowDown onPress={handleOpenForm} />
-      <Summary ref={summaryRef} onClose={handleCloseForm} />
+      <Summary
+        ref={summaryRef}
+        onClose={handleCloseForm}
+        paymentScreen="Basket"
+      />
     </GlobalContainer>
   );
 };

@@ -9,6 +9,8 @@ import { handleError } from '@/utils/handleError';
 import { api } from '@/services/api';
 import AddressCard from '@/components/AddressCard/AddressCard';
 import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
+import { MyAddress } from '@/interfaces/Address';
+import { prettyLog } from '@/services/prettyLog';
 import {
   AddressText,
   Card,
@@ -18,22 +20,9 @@ import {
   Row,
 } from './styles';
 
-export interface MyAddress {
-  id: string;
-  zipCode: string;
-  street: string;
-  number: string;
-  district: string;
-  city: string;
-  state: string;
-  type?: string;
-  created_at: Date;
-  updated_at: Date;
-  user_id: string;
-}
-
 const Addresses = () => {
   const [address, setAddress] = useState<MyAddress[]>([]);
+  prettyLog(address);
 
   const [isLoading, setIsLoading] = useState(false);
 

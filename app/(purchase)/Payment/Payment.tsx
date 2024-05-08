@@ -1,7 +1,7 @@
 import Header from '@/components/Header/Header';
 import { GlobalContainer, GlobalSubtitle } from '@/global/styles';
 import { router } from 'expo-router';
-import { ArrowDown, CreditCard } from '@/assets/icons';
+import { ArrowDown, CreditCardIcon } from '@/assets/icons';
 import { View } from 'react-native';
 import { theme } from '@/global/theme';
 import { useEffect, useRef, useState } from 'react';
@@ -94,7 +94,7 @@ const Payment = () => {
             isSelected={item.selected}
           >
             <IconWrapper>
-              <CreditCard />
+              <CreditCardIcon />
             </IconWrapper>
             <View>
               <View style={{ flexDirection: 'row' }}>
@@ -134,7 +134,11 @@ const Payment = () => {
         <ArrowDown onPress={handleOpenForm} style={{ alignSelf: 'center' }} />
       </Container>
 
-      <Summary ref={summaryRef} onClose={handleCloseForm} paymentScreen />
+      <Summary
+        ref={summaryRef}
+        onClose={handleCloseForm}
+        paymentScreen="Payment"
+      />
     </GlobalContainer>
   );
 };

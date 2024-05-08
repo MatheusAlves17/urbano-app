@@ -4,40 +4,24 @@ import { router } from 'expo-router';
 import { PinLight } from '@/assets/icons';
 import { View } from 'react-native';
 import { Button } from '@/components/Button/Button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { shadow } from '@/global/shadow';
+import { handleError } from '@/utils/handleError';
+import { api } from '@/services/api';
+import { MyAddress } from '@/interfaces/Address';
+import { useCart } from '@/hooks/useCart';
 import { AddressText, Card, Container, IconWrapper } from './styles';
 
-const Addresses = [
-  {
-    id: 'zxcvbn',
-    street: 'Rua Valentin Faustino',
-    number: '16',
-    zipcode: '00000-000',
-    city: 'Mogi das Cruzes',
-    state: 'SP',
-    selected: false,
-  },
-  {
-    id: 'cvbnm',
-    street: 'Rua Campos do Jordão',
-    number: '185',
-    zipcode: '08575-025',
-    city: 'Itaquaquecetuba',
-    state: 'SP',
-    selected: false,
-  },
-];
-
 const Delivery = () => {
+  const { addDelivery } = useCart();
   const handleSaveDelivery = () => {
     router.push('/Basket/');
   };
 
-  const [saveAddresses, setSaveAddresses] = useState(Addresses);
+  const [saveAddresses, setSaveAddresses] = useState<MyAddress[]>([]);
 
   const handleSelectAddress = (address_id: string) => {
-    const newAddress = Addresses.map(item => {
+    const newAddress = saveAddresses.map(item => {
       if (item.id === address_id) {
         return {
           ...item,
@@ -46,8 +30,22 @@ const Delivery = () => {
       }
       return item;
     });
+    addDelivery(address_id);
     setSaveAddresses(newAddress);
   };
+
+  const getAddress = async () => {
+    try {
+      const response = await api.get<MyAddress[]>('user/all-address');
+      setSaveAddresses(response.data);
+    } catch (error) {
+      handleError('Não foi possível encontrar os endereços salvos');
+    }
+  };
+
+  useEffect(() => {
+    getAddress();
+  }, []);
 
   return (
     <GlobalContainer>
@@ -65,7 +63,7 @@ const Delivery = () => {
             </IconWrapper>
             <View>
               <AddressText>
-                {item.street}, {item.number}, {item.zipcode}, {item.city} -{' '}
+                {item.street}, {item.number}, {item.zipCode}, {item.city} -{' '}
                 {item.state}
               </AddressText>
             </View>

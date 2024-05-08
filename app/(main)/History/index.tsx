@@ -4,6 +4,9 @@ import { useRouter } from 'expo-router';
 import { theme } from '@/global/theme';
 import { Clock01 } from '@/assets/pictures';
 import { shadow } from '@/global/shadow';
+import { handleError } from '@/utils/handleError';
+import { api } from '@/services/api';
+import { useEffect } from 'react';
 import {
   Card,
   Container,

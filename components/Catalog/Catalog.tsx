@@ -1,5 +1,5 @@
 import { GlobalLink, GlobalSubtitle, GlobalText } from '@/global/styles';
-import { FlatList, View } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import { Clock01, ClockCategories } from '@/assets/pictures';
 import { formatCurrency } from '@/utils/format';
 import { useRouter } from 'expo-router';
@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { api, imageURL } from '@/services/api';
 import { prettyLog } from '@/services/prettyLog';
 import { handleError } from '@/utils/handleError';
+import { theme } from '@/global/theme';
 import { Card, CardImage, Content, ItemsContainer, Row } from './styles';
 
 export interface Products {
@@ -15,10 +16,13 @@ export interface Products {
   price: string;
   stock: string;
   banner: string;
+  path: string;
 }
 
 const Catalog = () => {
   const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const [products, setProducts] = useState<Products[]>([]);
 
@@ -30,12 +34,14 @@ const Catalog = () => {
   };
 
   const getProducts = async () => {
+    setIsLoading(true);
     try {
       const response = await api.get(`product/all`);
       setProducts(response.data);
-      prettyLog(products);
     } catch (error) {
       handleError('Não foi possível carregar os produtos');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -50,7 +56,9 @@ const Catalog = () => {
         {products.map(item => (
           <Card key={item.id} onPress={() => handleGoTo(item.id)}>
             <CardImage
-              source={{ uri: `${imageURL}${item.banner}` }}
+              source={{
+                uri: `${imageURL}${item.path}`,
+              }}
               contentFit="contain"
             />
             <Row>
@@ -59,8 +67,11 @@ const Catalog = () => {
             </Row>
           </Card>
         ))}
-        {products.length === 0 && (
+        {products.length === 0 && !isLoading ? (
           <GlobalText>Não há produtos disponíveis</GlobalText>
+        ) : null}
+        {isLoading && (
+          <ActivityIndicator color={theme.colors.primary_01} size={24} />
         )}
       </ItemsContainer>
     </Content>

@@ -8,6 +8,7 @@ import { View } from 'react-native';
 import ListCategory from '@/components/ListCategory/ListCategory';
 import Catalog from '@/components/Catalog/Catalog';
 import { useAuth } from '@/hooks/useAuth';
+import { imageURL } from '@/services/api';
 import {
   AddressContainer,
   AddressLabel,
@@ -60,7 +61,7 @@ const Home = () => {
           <Highlight>
             <HightlightImage
               source={{
-                uri: 'https://beco-back.onrender.com/files/5863b9e103244bd684ad2f18fbdd6891-relogio-azul.png',
+                uri: `${imageURL}relogio-azul.png`,
               }}
               contentFit="contain"
             />

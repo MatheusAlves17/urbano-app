@@ -12,6 +12,7 @@ import { api } from '@/services/api';
 import { FormLogin, LoginSchema } from '@/validation/Login.validation';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@/hooks/useAuth';
+import { prettyLog } from '@/services/prettyLog';
 import { Content, Header, TextLink, Title } from './styles';
 import Input from '../Input/Input';
 import { Button } from '../Button/Button';
@@ -29,9 +30,9 @@ export const LoginForm = forwardRef<BottomSheet, LoginFormProps>(
 
     const { control, handleSubmit } = useForm<FormLogin>({
       resolver: yupResolver(LoginSchema),
-      // defaultValues: __DEV__
-      //   ? { email: 'matheus@gmail.com', password: 'Matt123#' }
-      //        : {},
+      defaultValues: __DEV__
+        ? { email: 'matheus@testando.com', password: '123456' }
+        : {},
     });
 
     const [isLoading, setIsLoading] = useState(false);

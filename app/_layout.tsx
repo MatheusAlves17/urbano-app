@@ -26,6 +26,7 @@ import useUpdate from '@/hooks/useUpdate';
 
 import { Slot, SplashScreen } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { CartProvider } from '@/hooks/useCart';
 
 export { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary';
 
@@ -70,17 +71,19 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
           <AuthProvider isAppReady={isAppReady}>
-            <SafeAreaProvider>
-              <SafeAreaView style={{ flex: 1 }}>
-                <StatusBar
-                  animated
-                  translucent
-                  backgroundColor={theme.colors.background}
-                />
-                <Slot />
-                <Toast config={toastConfig} />
-              </SafeAreaView>
-            </SafeAreaProvider>
+            <CartProvider>
+              <SafeAreaProvider>
+                <SafeAreaView style={{ flex: 1 }}>
+                  <StatusBar
+                    animated
+                    translucent
+                    backgroundColor={theme.colors.background}
+                  />
+                  <Slot />
+                  <Toast config={toastConfig} />
+                </SafeAreaView>
+              </SafeAreaProvider>
+            </CartProvider>
           </AuthProvider>
         </ThemeProvider>
       </QueryClientProvider>
