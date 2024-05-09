@@ -1,6 +1,6 @@
 import Header from '@/components/Header/Header';
 import { GlobalContainer, GlobalSubtitle } from '@/global/styles';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowDown, CreditCardIcon } from '@/assets/icons';
 import { View } from 'react-native';
 import { theme } from '@/global/theme';
@@ -46,6 +46,8 @@ const DataCard = [
 
 const Payment = () => {
   const [cards, setCards] = useState<ICard[]>(DataCard);
+  const { order_id } = useLocalSearchParams();
+  console.log(order_id);
 
   const summaryRef = useRef<BottomSheet | null>(null);
 

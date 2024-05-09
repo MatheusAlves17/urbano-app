@@ -8,6 +8,10 @@ import { forwardRef } from 'react';
 import { useRouter } from 'expo-router';
 import { formatCurrency } from '@/utils/format';
 import { useCart } from '@/hooks/useCart';
+import { api } from '@/services/api';
+import { useAuth } from '@/hooks/useAuth';
+import { prettyLog } from '@/services/prettyLog';
+import { handleError } from '@/utils/handleError';
 import {
   Container,
   Divider,
@@ -27,17 +31,56 @@ interface SummaryProps {
 const Summary = forwardRef<BottomSheet, SummaryProps>(
   ({ onClose, paymentScreen }, ref) => {
     const router = useRouter();
+    const { user } = useAuth();
 
-    const { addressId, valueTotal } = useCart();
+    const { addressId, valueTotal, cartItems } = useCart();
 
     const handleGoTo = () => {
+      if (addressId) {
+        return handleError('Escolha uma opção de endereço');
+      }
       switch (paymentScreen) {
         case 'Basket':
-          router.push('/Payment/Payment');
+          handleGoToPayment();
           break;
         default:
           router.push('/PurchaseSuccess/PurchaseSuccess');
           break;
+      }
+    };
+
+    const handleGoToPayment = async () => {
+      try {
+        const response = await api.post('order', {
+          delivery: 20,
+          value_total: valueTotal,
+          status_id: '6fdffb92-f4a0-4a3c-9488-941bdbc1c11a',
+          user_id: user.id,
+          address_id: addressId,
+        });
+        createOrderItems(response.data.id);
+      } catch (error) {
+        handleError(error);
+      }
+    };
+
+    const createOrderItems = async (order_id: string) => {
+      try {
+        for (const item of cartItems) {
+          await api.post('item', {
+            name: item.name,
+            price: item.price,
+            file: item.path,
+            order_id,
+            product_id: item.id,
+            status_id: '6fdffb92-f4a0-4a3c-9488-941bdbc1c11a',
+            user_id: user.id,
+          });
+        }
+        router.push({ pathname: '/Payment/Payment', params: { order_id } });
+      } catch (error) {
+        prettyLog(error);
+        handleError('Ocorreu um erro, tente mais tarde aqui');
       }
     };
 
