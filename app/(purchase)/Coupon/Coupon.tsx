@@ -7,6 +7,7 @@ import { formatCurrency } from '@/utils/format';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/Button/Button';
 import { shadow } from '@/global/shadow';
+import { useCart } from '@/hooks/useCart';
 import {
   Card,
   CouponCode,
@@ -24,7 +25,7 @@ interface ICoupon {
 const DataCoupon = [
   {
     id: 'f31c4',
-    value: 50,
+    value: 5,
   },
 
   {
@@ -39,10 +40,11 @@ const DataCoupon = [
 
 const Coupon = () => {
   const router = useRouter();
+  const { addCoupon } = useCart();
 
   const [coupons, setCoupons] = useState<ICoupon[]>(DataCoupon);
 
-  const handleSelectCoupon = (coupon_id: string) => {
+  const handleSelectCoupon = (coupon_id: string, value: number) => {
     const newCoupons = coupons.map(item => {
       if (coupon_id === item.id) {
         return {
@@ -53,6 +55,8 @@ const Coupon = () => {
       return item;
     });
     setCoupons(newCoupons);
+
+    addCoupon({ id: coupon_id, value });
   };
 
   const handleSaveCoupons = () => {
@@ -77,7 +81,7 @@ const Coupon = () => {
             style={{ ...shadow.default }}
             isSelected={item?.selected}
             key={item.id}
-            onPress={() => handleSelectCoupon(item.id)}
+            onPress={() => handleSelectCoupon(item.id, item.value)}
           >
             <IconWrapper>
               <CouponIcon />

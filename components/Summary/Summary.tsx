@@ -1,10 +1,9 @@
-import { ScrollView, TouchableOpacity, View } from 'react-native';
-import { ArrowDown, Close, CouponIcon, Pin, PinLight } from '@/assets/icons';
-import { GlobalLink, GlobalScrollView } from '@/global/styles';
-import { theme } from '@/global/theme';
+import { TouchableOpacity, View } from 'react-native';
+import { Close, CouponIcon, PinLight } from '@/assets/icons';
+import { GlobalLink } from '@/global/styles';
 import BottomSheet from '@gorhom/bottom-sheet';
 
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { formatCurrency } from '@/utils/format';
 import { useCart } from '@/hooks/useCart';
@@ -33,10 +32,13 @@ const Summary = forwardRef<BottomSheet, SummaryProps>(
     const router = useRouter();
     const { user } = useAuth();
 
-    const { addressId, valueTotal, cartItems } = useCart();
+    const { addressId, valueTotal, valueWithDiscount, cartItems, coupon } =
+      useCart();
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleGoTo = () => {
-      if (addressId) {
+      if (!addressId) {
         return handleError('Escolha uma opção de endereço');
       }
       switch (paymentScreen) {
@@ -50,6 +52,7 @@ const Summary = forwardRef<BottomSheet, SummaryProps>(
     };
 
     const handleGoToPayment = async () => {
+      setIsLoading(true);
       try {
         const response = await api.post('order', {
           delivery: 20,
@@ -61,6 +64,8 @@ const Summary = forwardRef<BottomSheet, SummaryProps>(
         createOrderItems(response.data.id);
       } catch (error) {
         handleError(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -95,7 +100,11 @@ const Summary = forwardRef<BottomSheet, SummaryProps>(
               </IconWrapper>
               <View>
                 <Title>Cupom</Title>
-                <Span>5 disponíveis</Span>
+                <Span>
+                  {coupon?.id
+                    ? 'Cupom selecionado'
+                    : 'Veja os cupons disponíveis'}
+                </Span>
               </View>
             </View>
             <TouchableOpacity onPress={() => router.push('/Coupon/Coupon')}>
@@ -135,35 +144,45 @@ const Summary = forwardRef<BottomSheet, SummaryProps>(
           </Row>
           <Row>
             <Subtitle>Cupom aplicado</Subtitle>
-            <Subtitle>- R$ 120.85</Subtitle>
+            <Subtitle>
+              {coupon?.id
+                ? formatCurrency(coupon.value)
+                : 'Nenhum cupom aplicado'}
+            </Subtitle>
           </Row>
           <Row>
             <Subtitle>Taxa de entrega</Subtitle>
-            <Subtitle>- R$ 20</Subtitle>
+            <Subtitle>R$ 20</Subtitle>
           </Row>
 
-          {/* {paymentScreen && (
-          <View>
-            <Title>Resumo do pagamento</Title>
-            <Row>
-              <Subtitle># 0235</Subtitle>
-              <Subtitle>- R$ 250</Subtitle>
-            </Row>
-            <Row>
-              <Subtitle># 3542</Subtitle>
-              <Subtitle>- R$ 250</Subtitle>
-            </Row>
-          </View>
-        )} */}
+          {/* {paymentScreen !== 'Basket' && (
+            <View>
+              <Title>Resumo do pagamento</Title>
+              {cards?.map(card => (
+                <Row>
+                  <Subtitle>Cartão</Subtitle>
+                  <Subtitle>{card.value}</Subtitle>
+                </Row>
+              ))}
+            </View>
+          )} */}
 
           <Divider style={{ marginTop: 16 }} />
           <Row>
             <Title style={{ marginTop: 0 }}>Total</Title>
-            <Title style={{ marginTop: 0 }}>{formatCurrency(valueTotal)}</Title>
+            <Title style={{ marginTop: 0 }}>
+              {valueWithDiscount
+                ? formatCurrency(valueWithDiscount)
+                : formatCurrency(valueTotal)}
+            </Title>
           </Row>
           <Divider />
 
-          <Button style={{ marginTop: 30 }} onPress={handleGoTo}>
+          <Button
+            style={{ marginTop: 30 }}
+            onPress={handleGoTo}
+            isLoading={isLoading}
+          >
             Continuar
           </Button>
         </Container>

@@ -28,7 +28,6 @@ const NewCard = () => {
   const params = useLocalSearchParams();
 
   const { path, card_id } = params;
-  console.log(card_id);
 
   const [isOpen, setIsOpen] = useState(false);
 

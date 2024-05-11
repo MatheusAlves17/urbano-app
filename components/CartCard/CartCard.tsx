@@ -21,8 +21,7 @@ interface CartProps {
 }
 
 export const CartCard = ({ item }: CartProps) => {
-  const { addToCart, removeFromCart, cartItems } = useCart();
-  prettyLog(cartItems);
+  const { addToCart, removeFromCart } = useCart();
   return (
     <CardContainer>
       <ImageContainer>

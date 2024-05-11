@@ -38,13 +38,12 @@ export const LoginForm = forwardRef<BottomSheet, LoginFormProps>(
     const [isLoading, setIsLoading] = useState(false);
 
     const onSubmit = async (dataForm: FormLogin) => {
+      setIsLoading(true);
       try {
         const { data } = await api.post('user/session', {
           email: dataForm.email,
           password: dataForm.password,
         });
-
-        setIsLoading(true);
 
         login(data);
 

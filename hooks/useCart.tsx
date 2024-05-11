@@ -1,3 +1,4 @@
+import { ICardPayment } from '@/interfaces/Payment';
 import { IProduct } from '@/interfaces/Product';
 import React, {
   ReactNode,
@@ -8,13 +9,18 @@ import React, {
 } from 'react';
 
 type AddressId = string;
+type Coupon = { id: string; value: number };
+
 interface CardContextProps {
   cartItems: IProduct[];
   addToCart: (product: IProduct) => void;
   removeFromCart: (product_id: string) => void;
   valueTotal: number;
+  valueWithDiscount: number;
   addDelivery: (address_id: string) => void;
   addressId?: AddressId;
+  addCoupon: (coupon: Coupon) => void;
+  coupon?: Coupon;
 }
 
 const CartContext = createContext({} as CardContextProps);
@@ -26,10 +32,16 @@ interface ChildrenProps {
 export const CartProvider = ({ children }: ChildrenProps) => {
   const [cartItems, setCartItems] = useState<IProduct[]>([]);
   const [valueTotal, setValueTotal] = useState(0);
+  const [valueWithDiscount, setValueWithDiscount] = useState(valueTotal);
   const [addressId, setAddressId] = useState('');
+  const [coupon, setCoupon] = useState<Coupon>();
 
   const addDelivery = (address_id: string) => {
     setAddressId(address_id);
+  };
+
+  const addCoupon = (couponSelected: Coupon) => {
+    setCoupon(couponSelected);
   };
 
   const addToCart = (item: IProduct) => {
@@ -73,11 +85,22 @@ export const CartProvider = ({ children }: ChildrenProps) => {
     sumValueCart();
   }, [cartItems]);
 
+  useEffect(() => {
+    calculateTotalValue();
+  }, [coupon]);
+
   const sumValueCart = () => {
     const total = cartItems.reduce((accumulator, currentItem) => {
       return accumulator + parseFloat(currentItem.price) * currentItem.quantity;
     }, 0);
     setValueTotal(total);
+    setValueWithDiscount(total);
+  };
+
+  const calculateTotalValue = () => {
+    if (coupon?.value) {
+      setValueWithDiscount(valueTotal - coupon.value);
+    }
   };
 
   return (
@@ -87,8 +110,11 @@ export const CartProvider = ({ children }: ChildrenProps) => {
         addToCart,
         removeFromCart,
         valueTotal,
+        valueWithDiscount,
         addDelivery,
+        addCoupon,
         addressId,
+        coupon,
       }}
     >
       {children}

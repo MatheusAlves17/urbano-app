@@ -12,23 +12,11 @@ import CreditCard from '@/components/CreditCard/CreditCard';
 import { theme } from '@/global/theme';
 import ModalSuccess from '@/components/ModalSuccess/ModalSuccess';
 import { prettyLog } from '@/services/prettyLog';
+import { Card, ICard } from '@/interfaces/Cards';
 import { Container, EditButton, Row } from './styles';
 
-export interface Card {
-  id: string;
-  number: string;
-  cvv: string;
-  validity: string;
-  name: string;
-  flag: string;
-  principal: boolean;
-  created_at: Date;
-  updated_at: Date;
-  user_id: string;
-}
-
 const MyCards = () => {
-  const [cards, setCards] = useState<Card[]>([]);
+  const [cards, setCards] = useState<ICard[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
