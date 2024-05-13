@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/Button/Button';
 import { shadow } from '@/global/shadow';
 import { useCart } from '@/hooks/useCart';
+import { handleError } from '@/utils/handleError';
+import { api } from '@/services/api';
 import {
   Card,
   CouponCode,
@@ -18,31 +20,19 @@ import {
 
 interface ICoupon {
   id: string;
-  value: number;
+  value: string;
+  isUsed: boolean;
+  created_at: Date;
+  updated_at: Date;
+  user_id: string;
   selected?: boolean;
 }
-
-const DataCoupon = [
-  {
-    id: 'f31c4',
-    value: 5,
-  },
-
-  {
-    id: 'f3lc4',
-    value: 70,
-  },
-  {
-    id: '4c13f',
-    value: 70,
-  },
-];
 
 const Coupon = () => {
   const router = useRouter();
   const { addCoupon } = useCart();
 
-  const [coupons, setCoupons] = useState<ICoupon[]>(DataCoupon);
+  const [coupons, setCoupons] = useState<ICoupon[]>([]);
 
   const handleSelectCoupon = (coupon_id: string, value: number) => {
     const newCoupons = coupons.map(item => {
@@ -63,9 +53,13 @@ const Coupon = () => {
     router.push('/Basket/');
   };
 
-  const getCoupons = () => {
-    const newItems = coupons.map(item => ({ ...item, isSelected: false }));
-    setCoupons(newItems);
+  const getCoupons = async () => {
+    try {
+      const response = await api.get('my-coupons');
+      setCoupons(response.data);
+    } catch (error) {
+      handleError('Não foi possível encontrar cupons');
+    }
   };
 
   useEffect(() => {
@@ -81,14 +75,16 @@ const Coupon = () => {
             style={{ ...shadow.default }}
             isSelected={item?.selected}
             key={item.id}
-            onPress={() => handleSelectCoupon(item.id, item.value)}
+            onPress={() => handleSelectCoupon(item.id, parseFloat(item.value))}
           >
             <IconWrapper>
               <CouponIcon />
             </IconWrapper>
             <View>
-              <CouponCode>Cod: {item.id}</CouponCode>
-              <CouponValue>{formatCurrency(item.value)} Off</CouponValue>
+              <CouponCode>Cupom disponível</CouponCode>
+              <CouponValue>
+                {formatCurrency(parseFloat(item.value))} Off
+              </CouponValue>
             </View>
           </Card>
         ))}
