@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import styled from 'styled-components/native';
 
-export const Container = styled.View`
+export const Container = styled.ScrollView`
   flex: 1;
   width: 100%;
 
@@ -9,8 +9,8 @@ export const Container = styled.View`
 `;
 
 export const Card = styled.TouchableOpacity<{ isSelected?: boolean }>`
-  width: 100%;
-
+  width: 99%;
+  align-self: center;
   flex-direction: row;
   justify-content: space-around;
 

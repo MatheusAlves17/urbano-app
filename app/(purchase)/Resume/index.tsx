@@ -10,11 +10,13 @@ import { useState } from 'react';
 import { api } from '@/services/api';
 import { handleError, handleSuccess } from '@/utils/handleError';
 import { prettyLog } from '@/services/prettyLog';
+import { TouchableOpacity } from 'react-native';
 import { Content, ContentTitle, Divider, Row, Span } from './styles';
 
 const Resume = () => {
   const router = useRouter();
   const { cartItems, coupon, valueWithDiscount, removeFromCart } = useCart();
+  const [showButton, setShowButton] = useState(false);
 
   const params = useLocalSearchParams() as any;
   const { cardsPayment, order_id } = params;
@@ -37,9 +39,8 @@ const Resume = () => {
         cards,
         coupon,
       });
-      handleSuccess(
-        'Compra confirmada, acompanhe seu pedido na aba de Pedidos',
-      );
+      handleSuccess('Sucesso, acompanhe seu pedido na aba de Pedidos');
+      setShowButton(true);
       console.log(response.data);
       for (cart of cartItems) {
         removeFromCart(cart.id);
@@ -104,6 +105,11 @@ const Resume = () => {
       <Button onPress={handlePayment} isLoading={isLoading}>
         Finalizar compra
       </Button>
+      {showButton && (
+        <TouchableOpacity onPress={() => router.push('/OrderDetails/')}>
+          <GlobalLink>Ver pedidos</GlobalLink>
+        </TouchableOpacity>
+      )}
     </GlobalContainer>
   );
 };

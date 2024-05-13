@@ -5,6 +5,7 @@ export const Container = styled.View`
   width: 100%;
   flex: 1;
   margin-top: 16px;
+  margin-bottom: 240px;
 `;
 
 export const Card = styled.TouchableOpacity.attrs({
@@ -61,4 +62,10 @@ export const Divider = styled.View`
   height: 1px;
 
   background-color: ${({ theme }) => theme.colors.white_02};
+`;
+
+export const CancelText = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.Urbanist_400};
+  color: ${({ theme }) => theme.colors.error};
+  font-size: 12px;
 `;

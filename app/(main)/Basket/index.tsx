@@ -8,10 +8,12 @@ import { router } from 'expo-router';
 import { CartCard } from '@/components/CartCard/CartCard';
 import { useCart } from '@/hooks/useCart';
 import { IProduct } from '@/interfaces/Product';
+import { prettyLog } from '@/services/prettyLog';
 import { Content } from './styles';
 
 const Basket = () => {
   const { cartItems, addressId } = useCart();
+  prettyLog(cartItems);
 
   const summaryRef = useRef<BottomSheet | null>(null);
 

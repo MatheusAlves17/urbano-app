@@ -4,10 +4,14 @@ import { useRouter } from 'expo-router';
 import { theme } from '@/global/theme';
 import { Clock01 } from '@/assets/pictures';
 import { shadow } from '@/global/shadow';
-import { handleError } from '@/utils/handleError';
-import { api } from '@/services/api';
-import { useEffect } from 'react';
+import { handleError, handleSuccess } from '@/utils/handleError';
+import { api, imageURL } from '@/services/api';
+import { useEffect, useState } from 'react';
+import { prettyLog } from '@/services/prettyLog';
+import { IOrders } from '@/interfaces/Orders';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import {
+  CancelText,
   Card,
   Container,
   Divider,
@@ -17,122 +21,118 @@ import {
   StatusOrder,
 } from './styles';
 
-const Orders = [
-  {
-    id: '2134',
-    status: 'em preparação',
-    items: [
-      {
-        id: '1',
-        price: 500,
-        name: 'Relógio 1',
-        image: Clock01,
-      },
-      {
-        id: '2',
-        price: 250,
-        name: 'Relógio 2',
-        image: Clock01,
-      },
-    ],
-  },
-  {
-    id: '9876',
-    status: 'entregue',
-    items: [
-      {
-        id: '3',
-        price: 580,
-        name: 'Relógio 3',
-        image: Clock01,
-      },
-      {
-        id: '2',
-        price: 365,
-        name: 'Relógio 4',
-        image: Clock01,
-      },
-      {
-        id: '4',
-        price: 962,
-        name: 'Relógio 5',
-        image: Clock01,
-      },
-    ],
-  },
-  {
-    id: '2563',
-    status: 'em troca/devolução',
-    items: [
-      {
-        id: '3',
-        price: 580,
-        name: 'Relógio 6',
-        image: Clock01,
-      },
-      {
-        id: '2',
-        price: 365,
-        name: 'Relógio 7',
-        image: Clock01,
-      },
-      {
-        id: '4',
-        price: 962,
-        name: 'Relógio 8',
-        image: Clock01,
-      },
-    ],
-  },
-];
-
 const History = () => {
+  const [orders, setOrders] = useState<IOrders[]>([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
+
   const handleGotoOrder = (order_id: string) => {
-    router.push('/OrderDetails/');
+    router.push({ pathname: '/OrderDetails/', params: { order_id } });
   };
+
+  const handleCancel = async (order_id: string) => {
+    try {
+      const response = await api.post(`order/cancel`, {
+        order_id,
+      });
+      handleSuccess('Solicitação enviada, acompanhe na aba de cancelamento');
+      handleGetOrders();
+    } catch (error) {
+      handleError('Falha em cancelar a compra, tente mais tarde');
+    }
+  };
+
+  const handleSendingItems = async (item: IOrders) => {
+    const items = item.item.map(product => product.id);
+
+    try {
+      const response = await api.post('item-sending', {
+        order_id: item.id,
+        items,
+      });
+
+      handleSuccess('Itens foram devolvidos com sucesso, aguarde...');
+      handleGetOrders();
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
+  const handleGetOrders = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.get('order/all');
+
+      setOrders(response.data);
+      prettyLog(orders);
+    } catch (error) {
+      handleError('Não foi possível encontrar as compras, tente mais tarde.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    handleGetOrders();
+  }, []);
 
   return (
     <GlobalContainer>
       <Header onPress={() => router.back()} title="Pedidos" />
-      <Container>
-        <GlobalSubtitle>Acompanhe seus pedidos</GlobalSubtitle>
-        {Orders.map(item => (
-          <Card
-            key={item.id}
-            onPress={() => handleGotoOrder(item.id)}
-            style={{ ...shadow.default }}
-          >
-            <Row>
-              {item.items.map(products => (
-                <ImageItems source={products.image} key={products.id} />
-              ))}
-            </Row>
-            <Divider />
-            <Row>
-              {item.status === 'em preparação' && (
-                <StatusIndicator status={theme.colors.warning_02} />
+      {isLoading ? (
+        <ActivityIndicator color={theme.colors.primary_01} size={24} />
+      ) : (
+        <Container>
+          <GlobalSubtitle>Acompanhe seus pedidos</GlobalSubtitle>
+          {orders.map(item => (
+            <Card
+              key={item.id}
+              onPress={() =>
+                item.status.name === 'Entregue' && handleGotoOrder(item.id)
+              }
+              style={{ ...shadow.default }}
+            >
+              <Row>
+                {item.item.map(product => (
+                  <ImageItems
+                    source={`${imageURL}${product.banner}`}
+                    key={product.id}
+                  />
+                ))}
+              </Row>
+              {/* <Row>
+                {item.status.name === 'Em preparação' && (
+                  <StatusIndicator status={theme.colors.warning_02} />
+                )}
+                {item.status.name === 'Entregue' && (
+                  <StatusIndicator status={theme.colors.success} />
+                )}
+                {item.status.name === 'Em troca' && (
+                  <StatusIndicator status={theme.colors.error} />
+                )}
+              </Row> */}
+              <StatusOrder>Status: {item.status.name}</StatusOrder>
+              {item.status.name !== 'Troca encerrada' ? (
+                <View>
+                  {item.status.name !== 'Cancelado' &&
+                  item.status.name !== 'Itens devolvidos' ? (
+                    <TouchableOpacity onPress={() => handleCancel(item.id)}>
+                      <CancelText>Cancelar compra</CancelText>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              ) : null}
+              {item.status.name === 'Cancelado' && (
+                <TouchableOpacity onPress={() => handleSendingItems(item)}>
+                  <CancelText>Devolver itens</CancelText>
+                </TouchableOpacity>
               )}
-              {item.status === 'entregue' && (
-                <StatusIndicator status={theme.colors.success} />
-              )}
-              {item.status === 'em troca/devolução' && (
-                <StatusIndicator status={theme.colors.error} />
-              )}
-              <StatusOrder>
-                Pedido {item.status} - N° {item.id}
-              </StatusOrder>
-            </Row>
-            <Divider />
-            {item.status === 'entregue' && (
-              <GlobalLink align="flex-end">Realizar troca/devolução</GlobalLink>
-            )}
-            {item.status === 'em troca/devolução' && (
-              <GlobalLink align="flex-end">Produtos foram enviados</GlobalLink>
-            )}
-          </Card>
-        ))}
-      </Container>
+            </Card>
+          ))}
+        </Container>
+      )}
     </GlobalContainer>
   );
 };

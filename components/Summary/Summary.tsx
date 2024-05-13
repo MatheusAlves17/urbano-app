@@ -72,15 +72,17 @@ const Summary = forwardRef<BottomSheet, SummaryProps>(
     const createOrderItems = async (order_id: string) => {
       try {
         for (const item of cartItems) {
-          await api.post('item', {
-            name: item.name,
-            price: item.price,
-            file: item.path,
-            order_id,
-            product_id: item.id,
-            status_id: '6fdffb92-f4a0-4a3c-9488-941bdbc1c11a',
-            user_id: user.id,
-          });
+          for (let i = 0; i < item.quantity; i++) {
+            await api.post('item', {
+              name: item.name,
+              price: item.price,
+              file: item.path,
+              order_id,
+              product_id: item.id,
+              status_id: '6fdffb92-f4a0-4a3c-9488-941bdbc1c11a',
+              user_id: user.id,
+            });
+          }
         }
         router.push({ pathname: '/Payment/Payment', params: { order_id } });
       } catch (error) {
